@@ -34,6 +34,11 @@ This package is not yet available on MELPA. Please clone this repo and include t
   (dashy-image (concat user-emacs-directory "emacs.svg")) ;; ~/.config/emacs/emacs.svg
   (initial-buffer-choice #'dashy-show) ;; make ‘dashy’ the initial buffer when opening emacs
   )
+
+;; You can override the default dashboard by defining the function ‘dashy-contents’
+(defun dashy-contents ()
+  (message "Hello World"))
+
 #+end_src
 
 * Why ?

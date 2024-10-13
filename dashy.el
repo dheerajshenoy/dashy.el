@@ -189,30 +189,29 @@
   "Insert image into dashboard"
   (if dashy-show-image
       (if (and (> (length dashy-image) 0) (file-exists-p dashy-image))
-          (let* ((img (create-image dashy-image nil nil :scale dashy-image-scale)))
+          (let* ((img (create-image dashy-image nil nil :scale dashy-image-scale))
+                 (line-prefix
+                  `(space . (:align-to (- center ,(/ 100 2))))))
             (insert-image img)
             (insert "\n\n")))))
 
 (defun dashy-contents ()
   "Function that defines the content of the dashboard"
-      ;; Image
-      (dashy--insert-image)
+  ;; Image
+  (dashy--insert-image)
 
-      ;; Title
-      (dashy--insert-title)
+  ;; Title
+  (dashy--insert-title)
 
-      ;; Recent Files
-      (dashy--insert-recent-files)
+  ;; Recent Files
+  (dashy--insert-recent-files)
 
-      ;; Bookmarks
-      (dashy--insert-bookmarks))
+  ;; Bookmarks
+  (dashy--insert-bookmarks))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interactive Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (setq line-prefix
-;;       `(space . (:align-to (- center ,(/ enlight-width 2))))))
 
 (defun dashy-show ()
   "Create a simple dashboard with useful information."
