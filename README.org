@@ -19,11 +19,11 @@
 - [[#customization-options][Customization Options]]
   - [[#general-appearance][General Appearance]]
   - [[#displaying-recent-files][Displaying Recent Files]]
-  - [[#displaying-bookmarks][Displaying Bookmarks:]]
+  - [[#displaying-bookmarks][Displaying Bookmarks]]
   - [[#faces][Faces]]
 - [[#functions][Functions]]
-  - [[#core-functions][Core Functions:]]
-  - [[#interactive-command][Interactive Command:]]
+  - [[#core-functions][Core Functions]]
+  - [[#interactive-command][Interactive Command]]
 - [[#todos][TODOs]]
 - [[#acknowledgement][Acknowledgement]]
 
@@ -102,7 +102,7 @@ You can customize the dashboard through a variety of user options (defcustom). T
 + =dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
 + =dashy-num-recent-files= The number of recent files to display. If set to -1, all recent files are displayed.
 
-** Displaying Bookmarks:
+** Displaying Bookmarks
 
 + =dashy-show-bookmarks= Toggle whether to display bookmarks in the dashboard.
 + =dashy-num-bookmarks= The number of bookmarks to display. If set to -1, all bookmarks are displayed.
@@ -118,7 +118,7 @@ Several faces are defined to customize the appearance of the dashboard:
 
 * Functions
 
-** Core Functions:
+** Core Functions
 
 + =dashy--get-title-text= Returns the title text for the dashboard based on user customization.
 + =dashy--create-link= Wraps text with properties to create clickable links for recent files.
@@ -131,7 +131,7 @@ Several faces are defined to customize the appearance of the dashboard:
 + =dashy--center-text= Centers the text between the specified region
 + =dashy--insert-center= Inserts a string in the center of the buffer
 
-** Interactive Command:
+** Interactive Command
 
 + =dashy-contents= This generates the contents of the dashboard. This function can be overloaded to output anything.
 + =dashy-show= The main interactive function that displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
