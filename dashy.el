@@ -31,14 +31,25 @@
 ;;   :type 'boolean
 ;;   :group 'dashy)
 
+;; (defcustom dashy-center-image t
+;;   "Center align the image"
+;;   :type 'boolean
+;;   :group 'dashy)
+
+
 (defcustom dashy-image nil
   "Path to an image that will be displayed in the dashboard"
-  :type 'boolean
+  :type 'string
   :group 'dashy)
 
 (defcustom dashy-show-title t
   "Show title in the dashy dashboard"
   :type 'boolean
+  :group 'dashy)
+
+(defcustom dashy-image-scale 8.0
+  "Scale of the dashy image displayed"
+  :type 'float
   :group 'dashy)
 
 (defcustom dashy-title "Dashy"
@@ -74,6 +85,11 @@
 (defcustom dashy-num-bookmarks 5
   "Number of bookmarks to display. If -1 display all bookmarks"
   :type 'int
+  :group 'dashy)
+
+(defcustom dashy-show-image t
+  "Show image if t"
+  :type 'boolean
   :group 'dashy)
 
 ;;;;;;;;;;;;;;;
@@ -170,6 +186,14 @@
                 (insert (format "- %s\n" bookmark)))
             (insert "No bookmarks found."))))))
 
+(defun dashy--insert-image ()
+  "Insert image into dashboard"
+  (if dashy-show-image
+      (if (and (> (length dashy-image) 0) (file-exists-p dashy-image))
+          (let* ((img (create-image dashy-image nil nil :scale dashy-image-scale)))
+            (insert-image img)
+            (insert "\n\n")))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interactive Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -184,6 +208,8 @@
     (with-current-buffer buf
       (read-only-mode -1)
       (erase-buffer)
+
+      (dashy--insert-image)
 
       ;; Title
       (dashy--insert-title)
