@@ -109,3 +109,4 @@ Several faces are defined to customize the appearance of the dashboard:
 - [ ] Image Support
 - [X] Center Align
 - [ ] Vertical Align
+- [ ] Open Bookmarks properly
