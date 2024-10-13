@@ -13,6 +13,7 @@
 - [[#features][Features]]
 - [[#installation][Installation]]
   - [[#use-package-declaration][Use Package Declaration]]
+  - [[#you-can-set-dashy-to-open-up-when-opening-emacs-by-default][You can set dashy to open up when opening emacs by default]]
 - [[#why-][Why ?]]
 - [[#why-the-name-dashy-][Why the name Dashy ?]]
 - [[#customization-options][Customization Options]]
@@ -56,13 +57,24 @@ This package is not yet available on MELPA. Please clone this repo and include t
   (dashy-num-recent-files 5) ;; total number of recent files to display
   (dashy-num-bookmarks 5) ;; total number of bookmarks to display
   ;; (dashy-image (concat user-emacs-directory "emacs.svg")) ;; ~/.config/emacs/emacs.svg FIXME: Not yet Implemented!
-  (initial-buffer-choice #'dashy-show) ;; make ‘dashy’ the initial buffer when opening emacs
   )
 
 ;; You can override the default dashboard by defining the function ‘dashy-contents’
 (defun dashy-contents ()
   (message "Hello World"))
 
+#+end_src
+
+** You can set dashy to open up when opening emacs by default
+
+#+begin_src elisp
+(setopt initial-buffer-choice #'dashy-show)
+#+end_src
+
+Or if you wanna do it manually just call the =dashy-show= interactive command
+
+#+begin_src elisp
+(dashy-show)
 #+end_src
 
 * Why ?

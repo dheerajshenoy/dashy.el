@@ -199,7 +199,7 @@
                   (bookmark-name (car bookmark)))
               (insert (dashy--create-link bookmark-name filename))
               (insert "\n")))))
-        (insert "No bookmarks found.")))
+    (insert "No bookmarks found.")))
 
 (defun dashy--str-len (str)
   "Calculate STR in pixel width."
