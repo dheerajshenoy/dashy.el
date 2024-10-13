@@ -24,6 +24,8 @@ This package is not yet available on MELPA. Please clone this repo and include t
   :load-path "<path to the dashy directory>" ;; add the dashy directory path you cloned at
   :custom
   (dashy-title "Dashy is Awesome") ;; title string
+  (dashy-center-horizontally t) ;; center the entire buffer horizontally
+  (dashy-center-vertically nil) ;; center the entire buffer vertically ;; FIXME: Not yet implemented!
   (dashy-show-title t) ;; show title or not ?
   (dashy-if-no-title-show-blank-lines nil) ;; if title is not specified, add blank padding at the top or not ?
   (dashy-show-recent-files t) ;; show recent files or not ?
@@ -31,7 +33,7 @@ This package is not yet available on MELPA. Please clone this repo and include t
   (dashy-linkify-recent-files t) ;; should add links to recent files to make it clickable and go to the respective file
   (dashy-num-recent-files 5) ;; total number of recent files to display
   (dashy-num-bookmarks 5) ;; total number of bookmarks to display
-  (dashy-image (concat user-emacs-directory "emacs.svg")) ;; ~/.config/emacs/emacs.svg
+  ;; (dashy-image (concat user-emacs-directory "emacs.svg")) ;; ~/.config/emacs/emacs.svg FIXME: Not yet Implemented!
   (initial-buffer-choice #'dashy-show) ;; make ‘dashy’ the initial buffer when opening emacs
   )
 
@@ -90,6 +92,10 @@ Several faces are defined to customize the appearance of the dashboard:
 + =dashy--insert-title= Inserts the dashboard title or blank lines based on user preferences.
 + =dashy--insert-recent-files= Displays a list of recent files, optionally linkified.
 + =dashy--insert-bookmarks= Displays a list of bookmarks.
++ =dashy--str-len= Calculates the pixel width of a text
++ =dashy--find-max-width= Returns the max width within the region specified in the buffer
++ =dashy--center-text= Centers the text between the specified region
++ =dashy--insert-center= Inserts a string in the center of the buffer
 
 ** Interactive Command:
 
@@ -100,6 +106,6 @@ Several faces are defined to customize the appearance of the dashboard:
 
 - [X] Bookmarks
 - [X] Recent Files
-- [X] Image Support
-- [ ] Center Align
+- [ ] Image Support
+- [X] Center Align
 - [ ] Vertical Align
