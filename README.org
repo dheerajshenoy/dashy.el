@@ -1,0 +1,67 @@
+* dashy.el
+
+=dashy.el= is a simple, customizable dashboard for Emacs that provides an overview of recent files and bookmarks. The dashboard is presented in a minimalistic manner, focusing on functionality and a clean interface.
+
+[[./images/image1.png]]
+
+* Features
+
++ Display a customizable title for the dashboard.
++ Show recent files from the recentf list.
++ Display bookmarks using Emacs' bookmark functionality.
++ Optionally linkify recent files for easy navigation.
++ Highly customizable, allowing users to control the appearance and content displayed.
+
+* Why ?
+
+I wanted to learn Emacs Lisp and what’s the best way than by writing a program.
+
+* Why the name Dashy ?
+
+I just felt like that this was a dashing name (🤣) for a dashing dashboard.
+
+* Customization Options
+
+You can customize the dashboard through a variety of user options (defcustom). These are the primary options available:
+
+** General Appearance
+
+    =dashy-image= Set an image to display on the dashboard. (Not yet implemented in the current version).
+    =dashy-show-title= Toggle whether the dashboard should display a title.
+    =dashy-title= The text used as the title of the dashboard. Default is "Dashy".
+    =dashy-if-no-title-show-blank-lines= When the title is disabled, insert blank lines in its place to maintain layout.
+
+** Displaying Recent Files
+
+    =dashy-show-recent-files= Toggle whether to display recent files in the dashboard.
+    =dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
+    =dashy-num-recent-files= The number of recent files to display. If set to -1, all recent files are displayed.
+
+** Displaying Bookmarks:
+
+    =dashy-show-bookmarks= Toggle whether to display bookmarks in the dashboard.
+    =dashy-num-bookmarks= The number of bookmarks to display. If set to -1, all bookmarks are displayed.
+
+** Faces
+
+Several faces are defined to customize the appearance of the dashboard:
+
+    =dashy-title-face= Used to style the dashboard title.
+    =dashy-header-face= Used to style the headers for sections like "Recent Files" and "Bookmarks".
+    =dashy-recent-files-link-face= Used to style clickable links for recent files.
+    =dashy-recent-files-mouse-hover-face= Used to style clickable links when hovered over with the mouse.
+
+* Functions
+
+** Core Functions:
+
+    =dashy--get-title-text= Returns the title text for the dashboard based on user customization.
+    =dashy--create-link= Wraps text with properties to create clickable links for recent files.
+    =dashy--insert-header= Inserts a header with a customizable face (used for sections like "Recent Files" and "Bookmarks").
+    =dashy--insert-title= Inserts the dashboard title or blank lines based on user preferences.
+    =dashy--insert-recent-files= Displays a list of recent files, optionally linkified.
+    =dashy--insert-bookmarks= Displays a list of bookmarks.
+
+** Interactive Command:
+
+    =dashy-show= The main interactive function that generates and displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
