@@ -26,42 +26,42 @@ You can customize the dashboard through a variety of user options (defcustom). T
 
 ** General Appearance
 
-    =dashy-image= Set an image to display on the dashboard. (Not yet implemented in the current version).
-    =dashy-show-title= Toggle whether the dashboard should display a title.
-    =dashy-title= The text used as the title of the dashboard. Default is "Dashy".
-    =dashy-if-no-title-show-blank-lines= When the title is disabled, insert blank lines in its place to maintain layout.
++ =dashy-image= Set an image to display on the dashboard. (Not yet implemented in the current version).
++ =dashy-show-title= Toggle whether the dashboard should display a title.
++ =dashy-title= The text used as the title of the dashboard. Default is "Dashy".
++ =dashy-if-no-title-show-blank-lines= When the title is disabled, insert blank lines in its place to maintain layout.
 
 ** Displaying Recent Files
 
-    =dashy-show-recent-files= Toggle whether to display recent files in the dashboard.
-    =dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
-    =dashy-num-recent-files= The number of recent files to display. If set to -1, all recent files are displayed.
++ =dashy-show-recent-files= Toggle whether to display recent files in the dashboard.
++  ==dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
++ =dashy-num-recent-files= The number of recent files to display. If set to -1, all recent files are displayed.
 
 ** Displaying Bookmarks:
 
-    =dashy-show-bookmarks= Toggle whether to display bookmarks in the dashboard.
-    =dashy-num-bookmarks= The number of bookmarks to display. If set to -1, all bookmarks are displayed.
++ =dashy-show-bookmarks= Toggle whether to display bookmarks in the dashboard.
++ =dashy-num-bookmarks= The number of bookmarks to display. If set to -1, all bookmarks are displayed.
 
 ** Faces
 
 Several faces are defined to customize the appearance of the dashboard:
 
-    =dashy-title-face= Used to style the dashboard title.
-    =dashy-header-face= Used to style the headers for sections like "Recent Files" and "Bookmarks".
-    =dashy-recent-files-link-face= Used to style clickable links for recent files.
-    =dashy-recent-files-mouse-hover-face= Used to style clickable links when hovered over with the mouse.
++ =dashy-title-face= Used to style the dashboard title.
++ =dashy-header-face= Used to style the headers for sections like "Recent Files" and "Bookmarks".
++ =dashy-recent-files-link-face= Used to style clickable links for recent files.
++ =dashy-recent-files-mouse-hover-face= Used to style clickable links when hovered over with the mouse.
 
 * Functions
 
 ** Core Functions:
 
-    =dashy--get-title-text= Returns the title text for the dashboard based on user customization.
-    =dashy--create-link= Wraps text with properties to create clickable links for recent files.
-    =dashy--insert-header= Inserts a header with a customizable face (used for sections like "Recent Files" and "Bookmarks").
-    =dashy--insert-title= Inserts the dashboard title or blank lines based on user preferences.
-    =dashy--insert-recent-files= Displays a list of recent files, optionally linkified.
-    =dashy--insert-bookmarks= Displays a list of bookmarks.
++ =dashy--get-title-text= Returns the title text for the dashboard based on user customization.
++ =dashy--create-link= Wraps text with properties to create clickable links for recent files.
++ =dashy--insert-header= Inserts a header with a customizable face (used for sections like "Recent Files" and "Bookmarks").
++ =dashy--insert-title= Inserts the dashboard title or blank lines based on user preferences.
++ =dashy--insert-recent-files= Displays a list of recent files, optionally linkified.
++ =dashy--insert-bookmarks= Displays a list of bookmarks.
 
 ** Interactive Command:
 
-    =dashy-show= The main interactive function that generates and displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
++ =dashy-show= The main interactive function that generates and displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
