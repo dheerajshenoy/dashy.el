@@ -4,16 +4,17 @@
 ;; Created by: Dheeraj Vittal Shenoy <dheerajshenoy22@gmail.com>
 ;; Github Repository: https://www.github.com/dheerajshenoy/dashy.el
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define the dashy Group ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'bookmark)
 
 (defgroup dashy nil
   "Minimal Dashboard"
   :group 'extensions
   :group 'convenience
-  :version "31.0.50"
+  :version "31"
   :link '(emacs-library-link :tag "Lisp File" "dashy.el"))
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -197,3 +198,5 @@
       (read-only-mode 1)
       (goto-char (point-min)))
     (switch-to-buffer buf)))
+
+(provide 'dashy)
