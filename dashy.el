@@ -36,7 +36,6 @@
 ;;   :type 'boolean
 ;;   :group 'dashy)
 
-
 (defcustom dashy-image nil
   "Path to an image that will be displayed in the dashboard"
   :type 'string
@@ -194,6 +193,20 @@
             (insert-image img)
             (insert "\n\n")))))
 
+(defun dashy-contents ()
+  "Function that defines the content of the dashboard"
+      ;; Image
+      (dashy--insert-image)
+
+      ;; Title
+      (dashy--insert-title)
+
+      ;; Recent Files
+      (dashy--insert-recent-files)
+
+      ;; Bookmarks
+      (dashy--insert-bookmarks))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interactive Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -208,19 +221,7 @@
     (with-current-buffer buf
       (read-only-mode -1)
       (erase-buffer)
-
-      (dashy--insert-image)
-
-      ;; Title
-      (dashy--insert-title)
-
-      ;; Recent Files
-      (dashy--insert-recent-files)
-
-      ;; Bookmarks
-      (dashy--insert-bookmarks)
-
-      ;; Make buffer read-only and display it
+      (dashy-contents)
       (read-only-mode 1)
       (goto-char (point-min)))
     (switch-to-buffer buf)))

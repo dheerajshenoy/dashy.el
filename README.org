@@ -12,6 +12,30 @@
 + Optionally linkify recent files for easy navigation.
 + Highly customizable, allowing users to control the appearance and content displayed.
 
+* Installation
+
+This package is not yet available on MELPA. Please clone this repo and include the path to load in your emacs configuration.
+
+** Use Package Declaration
+
+#+begin_src elisp
+(use-package dashy
+  :ensure nil
+  :load-path "<path to the dashy directory>" ;; add the dashy directory path you cloned at
+  :custom
+  (dashy-title "Dashy is Awesome") ;; title string
+  (dashy-show-title t) ;; show title or not ?
+  (dashy-if-no-title-show-blank-lines nil) ;; if title is not specified, add blank padding at the top or not ?
+  (dashy-show-recent-files t) ;; show recent files or not ?
+  (dashy-show-bookmarks t) ;; show bookmarks or not ?
+  (dashy-linkify-recent-files t) ;; should add links to recent files to make it clickable and go to the respective file
+  (dashy-num-recent-files 5) ;; total number of recent files to display
+  (dashy-num-bookmarks 5) ;; total number of bookmarks to display
+  (dashy-image (concat user-emacs-directory "emacs.svg")) ;; ~/.config/emacs/emacs.svg
+  (initial-buffer-choice #'dashy-show) ;; make ‘dashy’ the initial buffer when opening emacs
+  )
+#+end_src
+
 * Why ?
 
 I wanted to learn Emacs Lisp and what’s the best way than by writing a program.
@@ -64,12 +88,13 @@ Several faces are defined to customize the appearance of the dashboard:
 
 ** Interactive Command:
 
-+ =dashy-show= The main interactive function that generates and displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
++ =dashy-contents= This generates the contents of the dashboard. This function can be overloaded to output anything.
++ =dashy-show= The main interactive function that displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
 
 * TODOs
 
-- [x] Bookmarks
-- [x] Recent Files
-- [x] Image Support
+- [X] Bookmarks
+- [X] Recent Files
+- [X] Image Support
 - [ ] Center Align
 - [ ] Vertical Align
