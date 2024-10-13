@@ -34,7 +34,7 @@ You can customize the dashboard through a variety of user options (defcustom). T
 ** Displaying Recent Files
 
 + =dashy-show-recent-files= Toggle whether to display recent files in the dashboard.
-+  ==dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
++ =dashy-linkify-recent-files= If enabled, recent files will be clickable, allowing quick navigation.
 + =dashy-num-recent-files= The number of recent files to display. If set to -1, all recent files are displayed.
 
 ** Displaying Bookmarks:
