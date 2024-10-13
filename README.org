@@ -65,3 +65,11 @@ Several faces are defined to customize the appearance of the dashboard:
 ** Interactive Command:
 
 + =dashy-show= The main interactive function that generates and displays the dashboard. It creates a buffer with recent files, bookmarks, and any other configured elements, making it easy for the user to access important information.
+
+* TODOs
+
+- [x] Bookmarks
+- [x] Recent Files
+- [x] Image Support
+- [ ] Center Align
+- [ ] Vertical Align
