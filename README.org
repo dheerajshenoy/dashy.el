@@ -8,6 +8,24 @@
 
 /With center align option/
 
+* Table of Contents :toc:
+- [[#dashyel][dashy.el]]
+- [[#features][Features]]
+- [[#installation][Installation]]
+  - [[#use-package-declaration][Use Package Declaration]]
+- [[#why-][Why ?]]
+- [[#why-the-name-dashy-][Why the name Dashy ?]]
+- [[#customization-options][Customization Options]]
+  - [[#general-appearance][General Appearance]]
+  - [[#displaying-recent-files][Displaying Recent Files]]
+  - [[#displaying-bookmarks][Displaying Bookmarks:]]
+  - [[#faces][Faces]]
+- [[#functions][Functions]]
+  - [[#core-functions][Core Functions:]]
+  - [[#interactive-command][Interactive Command:]]
+- [[#todos][TODOs]]
+- [[#acknowledgement][Acknowledgement]]
+
 * Features
 
 + Display a customizable title for the dashboard.
@@ -114,3 +132,10 @@ Several faces are defined to customize the appearance of the dashboard:
 - [X] Center Align
 - [ ] Vertical Align
 - [ ] Open Bookmarks properly
+
+* Acknowledgement
+
+*Dashy* is inspired by the similar dashboard packages. I have also shamelessly borrowed few codes from these packages as the documentation for alignment and other stuff was a bit all over the place and confusing. A huge thanks you developers of the following packages:
+
++ [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]]
++ [[https://github.com/ichernyshovvv/enlight][Enlight]]
