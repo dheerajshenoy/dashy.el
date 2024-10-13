@@ -4,6 +4,10 @@
 
 [[./images/image1.png]]
 
+[[./images/image2.png]]
+
+/With center align option/
+
 * Features
 
 + Display a customizable title for the dashboard.
