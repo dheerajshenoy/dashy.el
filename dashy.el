@@ -17,6 +17,20 @@
   :version "31"
   :link '(emacs-library-link :tag "Lisp File" "dashy.el"))
 
+(define-derived-mode dashy-mode fundamental-mode "Dashy"
+  "Toggle dashy-mode.
+Interactively with no argument, this command toggles the dashboard mode.
+
+When Dashy mode is enabled, the 'C-n' key goes to the next link item and 'C-p' goes to the
+previous item. 'C-{' goes to the previous header and 'C-}' goes to the next header.
+See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
+\\[dashy-goto-prev-header] and \\[dashy-goto-next-header]."
+  ;; The initial value
+  nil
+  ;; The indicator for the modeline
+  " Dashy")
+
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -40,6 +54,11 @@
 ;;   "Path to an image that will be displayed in the dashboard"
 ;;   :type 'string
 ;;   :group 'dashy)
+
+(defcustom dashy-bookmark-show-file-path t
+  "Show filepath of the associated bookmark file"
+  :type 'boolean
+  :group 'dashy)
 
 (defcustom dashy-show-title t
   "Show title in the dashy dashboard"
@@ -72,7 +91,12 @@
   :group 'dashy)
 
 (defcustom dashy-linkify-recent-files t
-  "Add links to recent files if t"
+  "Add links to files if t"
+  :type 'boolean
+  :group 'dashy)
+
+(defcustom dashy-linkify-bookmarks t
+  "Add links to bookmarks if t"
   :type 'boolean
   :group 'dashy)
 
@@ -90,6 +114,11 @@
 ;;   "Show image if t"
 ;;   :type 'boolean
 ;;   :group 'dashy)
+
+(defcustom dashy-components '(title recentfiles bookmarks)
+  "Components that are displayed in the dashboard"
+  :type '(repeat symbol)
+  :group 'dashy)
 
 ;;;;;;;;;;;;;;;
 ;; Variables ;;
@@ -113,13 +142,23 @@
   :group 'dashy)
 
 (defface dashy-recent-files-link-face
-  '((t :weight bold :italic t :foreground "light blue" :underline t))
+  '((t :weight bold :italic t :foreground "light blue" :underline nil))
   "Face for the recent files link"
   :group 'dashy)
 
 (defface dashy-recent-files-mouse-hover-face
   '((t :weight bold :italic t :foreground "blue" :underline t))
   "Face for the recent files link mouse hover"
+  :group 'dashy)
+
+(defface dashy-bookmark-link-face
+  '((t :weight bold :italic t :foreground "light blue" :underline nil))
+  "Face for the bookmark link"
+  :group 'dashy)
+
+(defface dashy-bookmark-mouse-hover-face
+  '((t :weight bold :italic t :foreground "blue" :underline t))
+  "Face for the bookmark link mouse hover"
   :group 'dashy)
 
 ;;;;;;;;;;;;;;;
@@ -134,26 +173,52 @@
   "Return the dashy buffer name"
   (format "%s" dashy--buffer-name))
 
-(defun dashy--create-link (str link)
+(defun dashy--create-recent-file-link (str link &optional func)
   "Return a link STR which points to the link LINK"
   (when dashy-linkify-recent-files
-    (propertize link
+    (propertize str
                 'face 'dashy-recent-files-link-face
                 'mouse-face 'dashy-recent-files-mouse-hover-face
                 'help-echo (format "Click to open %s" link)
                 'keymap (let ((map (make-sparse-keymap)))
                           (define-key map [mouse-1] (lambda () (interactive)
-                                                      (find-file link)))
+                                                      (if func
+                                                          (funcall func link)
+                                                        (find-file link))))
                           (define-key map [return] (lambda () (interactive)
-                                                     (find-file link)))
+                                                     (if func
+                                                         (funcall func link)
+                                                       (find-file link))))
+                          map))))
+
+(defun dashy--create-bookmark-link (str link &optional func)
+  "Return a link STR which points to the link LINK"
+  (when dashy-linkify-bookmarks
+    (propertize str
+                'face 'dashy-bookmark-link-face
+                'mouse-face 'dashy-bookmark-mouse-hover-face
+                'help-echo (format "Click to open %s" link)
+                'keymap (let ((map (make-sparse-keymap)))
+                          (define-key map [mouse-1] (lambda () (interactive)
+                                                      (if func
+                                                          (funcall func link)
+                                                        (find-file link))))
+                          (define-key map [return] (lambda () (interactive)
+                                                     (if func
+                                                         (funcall func link)
+                                                       (find-file link))))
                           map))))
 
 (defun dashy--insert-header (text)
   "Returns a formatted text for header that takes in the text TEXT"
-  (let* ((header (propertize (format "%s\n\n" text) 'face 'dashy-header-face)))
+  (let* ((header (propertize text 'face 'dashy-header-face))
+         (start (point)))
     (if dashy-center-horizontally
         (dashy--insert-center header)
-      (insert header))))
+      (insert header))
+    (put-text-property start (point) 'header "t" )
+    (insert "\n\n")
+    ))
 
 (defun dashy--insert-title ()
   "Insert the dashy title into the dashy dashboard"
@@ -164,6 +229,10 @@
           (insert title)))
     (if dashy-if-no-title-show-blank-lines (insert "\n\n"))))
 
+(defun dashy--add-item-property (object start end)
+  "Add item text-property for the OBJECT from START to END"
+  (put-text-property start end 'item "t"))
+
 (defun dashy--insert-recent-files ()
   "Insert recent files into the dashy dashboard"
   (if dashy-show-recent-files
@@ -172,34 +241,53 @@
         (if recentf-list
             (let* ((files (if (equal dashy-num-recent-files -1)
                               recentf-list
-                            (seq-take recentf-list dashy-num-recent-files))))
+                            (seq-take recentf-list dashy-num-recent-files)))
+                   start)
               (if dashy-center-horizontally
                   (dolist (file files)
-                    (dashy--insert-center (dashy--create-link file file))
+                    (setq-local start (point))
+                    (dashy--add-item-property (dashy--insert-center (dashy--create-recent-file-link file file)) start (point))
                     (insert "\n"))
                 (dolist (file files)
-                  (insert (dashy--create-link file file))
+                  (insert (dashy--create-recent-file-link file file))
                   (insert "\n"))))
           (insert "No recent files\n"))
         (insert "\n"))))
+
+(defun dashy--get-bookmarks-with-locations ()
+  "Return a list of bookmarks with their locations."
+  (bookmark-maybe-load-default-file) ;; Ensure bookmarks are loaded
+  (mapcar (lambda (bookmark)
+            (let* ((bm (bookmark-get-bookmark bookmark))
+                   (name (bookmark-name-from-full-record bm))
+                   (location (bookmark-get-filename bm)))
+              (cons name location)))
+          bookmark-alist))
 
 (defun dashy--insert-bookmarks ()
   "Insert bookmarks into the dashy dashboard"
   (if dashy-show-bookmarks
       (progn
         (dashy--insert-header "Bookmarks")
-        (if dashy-center-horizontally
-            (dolist (bookmark bookmark-alist)
-              (let ((filename (cdr (assoc 'filename (cdr bookmark))))
-                    (bookmark-name (car bookmark)))
-                (dashy--insert-center (dashy--create-link bookmark-name filename))
-                (insert "\n")))
-          (dolist (bookmark bookmark-alist)
-            (let ((filename (cdr (assoc 'filename (cdr bookmark))))
-                  (bookmark-name (car bookmark)))
-              (insert (dashy--create-link bookmark-name filename))
-              (insert "\n")))))
-    (insert "No bookmarks found.")))
+        (let ((bookmarks (dashy--get-bookmarks-with-locations)))
+          (if bookmarks
+              (if dashy-center-horizontally
+                  (dolist (bookmark bookmarks)
+                    (dashy--insert-center (dashy--create-bookmark-link
+                                           (if dashy-bookmark-show-file-path
+                                               (format "%s (%s)" (car bookmark) (cdr bookmark))
+                                             (car bookmark))
+                                           (car bookmark) #'bookmark-jump))
+                    (insert "\n"))
+                (dolist (bookmark bookmarks)
+                  (insert (dashy--create-bookmark-link
+                           (if dashy-bookmark-show-file-path
+                               (format "%s (%s)" (car bookmark) (cdr bookmark))
+                             (car bookmark))
+                           (car bookmark) #'bookmark-jump))
+                  (insert "\n")))
+            (insert "No bookmarks found."))))))
+
 
 (defun dashy--str-len (str)
   "Calculate STR in pixel width."
@@ -244,18 +332,10 @@
 
 (defun dashy-contents ()
   "Function that defines the content of the dashboard"
-  ;; Image
-
-  ;; (dashy--insert-image)
-
-  ;; Title
-  (dashy--insert-title)
-
-  ;; Recent Files
-  (dashy--insert-recent-files)
-
-  ;; Bookmarks
-  (dashy--insert-bookmarks))
+  (dolist (component dashy-components)
+    (cond ((equal component 'title) (dashy--insert-title))
+          ((equal component 'recentfiles) (dashy--insert-recent-files))
+          ((equal component 'bookmarks) (dashy--insert-bookmarks)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interactive Functions ;;
@@ -264,6 +344,7 @@
 (defun dashy-show ()
   "Create a simple dashboard with useful information."
   (interactive)
+  (dashy-mode)
   (let ((buf (get-buffer-create (dashy--get-dashy-buffer-name))))
     (with-current-buffer buf
       (read-only-mode -1)
@@ -272,5 +353,40 @@
       (read-only-mode 1)
       (goto-char (point-min)))
     (switch-to-buffer buf)))
+
+(defun dashy-goto-next-item ()
+  "Goto the next item in the dashboard"
+  (interactive)
+  (let ((pos (next-single-property-change (point) 'item)))
+    (if pos
+        (goto-char pos))))
+
+(defun dashy-goto-prev-item ()
+  "Goto the previous item in the dashboard"
+  (interactive)
+  ())
+
+(defun dashy-goto-next-header ()
+  "Goto the next header in the dashboard"
+  (interactive)
+  (let ((pos (next-single-property-change (point) 'header)))
+    (if pos
+        (goto-char pos))))
+
+(defun dashy-goto-prev-header ()
+  "Goto the prev header in the dashboard"
+  (interactive)
+  (let ((pos (next-single-property-change (point) 'header)))
+    (if pos
+        (goto-char pos))))
+
+(define-key dashy-mode-map (kbd "C-n") 'dashy-goto-next-item)
+(define-key dashy-mode-map (kbd "C-p") 'dashy-goto-prev-item)
+
+;; Evil mode support
+(if (bound-and-true-p evil-mode)
+    (progn
+      (define-key dashy-mode-map (kbd "j") 'dashy-goto-next-item)
+      (define-key dashy-mode-map (kbd "k") 'dashy-goto-prev-item)))
 
 (provide 'dashy)
