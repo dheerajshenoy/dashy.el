@@ -1,8 +1,33 @@
-;; -*- lexical-binding: t -*-
+;;; dashy.el --- Minimal & Customizable Dashboard -*- lexical-binding: t; -*-
 
-;; This is the source code for the program ‘dashy.el’ which is displays a minimal dashboard.
-;; Created by: Dheeraj Vittal Shenoy <dheerajshenoy22@gmail.com>
-;; Github Repository: https://www.github.com/dheerajshenoy/dashy.el
+;; Copyright (C) 2024  Dheeraj Vittal Shenoy
+
+;; Author: Dheeraj Vittal Shenoy <dheerajshenoy22@gmail.com>
+;; Version: 0.1
+;; Package-Requires: ((emacs "29"))
+;; Keywords: startup, screen, tools, dashboard
+;; URL: https://github.com/dheerajshenoy/dashy.el
+
+;;; License:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Minimal & Customizable startup screen.
+
+;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define the dashy Group ;;
@@ -11,25 +36,19 @@
 (require 'bookmark)
 
 (defgroup dashy nil
-  "Minimal Dashboard"
-  :group 'extensions
-  :group 'convenience
-  :version "31"
-  :link '(emacs-library-link :tag "Lisp File" "dashy.el"))
+  "Minimal & Customizable Dashboard"
+  :group 'applications
+  :prefix "dashy-")
 
-(define-derived-mode dashy-mode fundamental-mode "Dashy"
-  "Toggle dashy-mode.
-Interactively with no argument, this command toggles the dashboard mode.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Major Mode Definition ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-When Dashy mode is enabled, the 'C-n' key goes to the next link item and 'C-p' goes to the
-previous item. 'C-{' goes to the previous header and 'C-}' goes to the next header.
-See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
-\\[dashy-goto-prev-header] and \\[dashy-goto-next-header]."
-  ;; The initial value
-  nil
-  ;; The indicator for the modeline
-  " Dashy")
-
+(define-derived-mode dashy-mode
+  special-mode "Dashy"
+  (when (fboundp #'cursor-face-highlight-mode)
+    (setq cursor-type nil)
+    (cursor-face-highlight-mode 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables ;;
@@ -42,6 +61,11 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
 
 (defcustom dashy-center-horizontally  t
   "Center dashboard contents horizontally"
+  :type 'boolean
+  :group 'dashy)
+
+(defcustom dashy-no-evil-bindings t
+  "If set to true, make emacs state the default state on init"
   :type 'boolean
   :group 'dashy)
 
@@ -120,11 +144,21 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
   :type '(repeat symbol)
   :group 'dashy)
 
-;;;;;;;;;;;;;;;
-;; Variables ;;
-;;;;;;;;;;;;;;;
+;;;;;;;;;;;
+;; Hooks ;;
+;;;;;;;;;;;
 
-(defvar-local dashy--buffer-name "*Dashy*"
+(defcustom dashy-after-show-hook nil
+  "Hook run after showing dashy dashboard"
+  :type 'hook)
+
+;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;; ;;
+;; ;; Variables ;; ;;
+;; ;;;;;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;;;;;
+
+(defvar dashy--buffer-name "*Dashy*"
   "Dashy dashboard buffer name")
 
 ;;;;;;;;;;;
@@ -135,6 +169,10 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
   '((t :weight bold :height 2.0 :foreground "pink"))
   "Face for the dashy title"
   :group 'dashy)
+
+(defface dashy-item-face
+  '((t :weight bold :height 1.0 :underline t))
+  "Face for the dashboard items")
 
 (defface dashy-header-face
   '((t :weight bold :italic t :foreground "pink"))
@@ -209,6 +247,19 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
                                                        (find-file link))))
                           map))))
 
+(defun dashy--insert-item-button (text func)
+  (insert-button text
+                 'action func
+                 'follow-link t
+                 'face 'dashy-item-face))
+
+
+(defun dashy--insert-item-center-button (text func)
+  (dashy--insert-center (insert-button text
+                                       'action func
+                                       'follow-link t
+                                       'face 'dashy-item-face)))
+
 (defun dashy--insert-header (text)
   "Returns a formatted text for header that takes in the text TEXT"
   (let* ((header (propertize text 'face 'dashy-header-face))
@@ -245,12 +296,12 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
                    start)
               (if dashy-center-horizontally
                   (dolist (file files)
-                    (setq-local start (point))
-                    (dashy--add-item-property (dashy--insert-center (dashy--create-recent-file-link file file)) start (point))
+                    (dashy--insert-item-button file #'(lambda (x) (find-file file)))
                     (insert "\n"))
                 (dolist (file files)
-                  (insert (dashy--create-recent-file-link file file))
-                  (insert "\n"))))
+                  (dashy--insert-item-button file #'(lambda (x) (find-file file)))
+                  (insert "\n")
+                  )))
           (insert "No recent files\n"))
         (insert "\n"))))
 
@@ -273,21 +324,20 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
           (if bookmarks
               (if dashy-center-horizontally
                   (dolist (bookmark bookmarks)
-                    (dashy--insert-center (dashy--create-bookmark-link
+                    (dashy--insert-item-center-button
                                            (if dashy-bookmark-show-file-path
                                                (format "%s (%s)" (car bookmark) (cdr bookmark))
                                              (car bookmark))
-                                           (car bookmark) #'bookmark-jump))
+                                           #'(lambda (x) (bookmark-jump (cdr bookmark))))
                     (insert "\n"))
                 (dolist (bookmark bookmarks)
-                  (insert (dashy--create-bookmark-link
-                           (if dashy-bookmark-show-file-path
-                               (format "%s (%s)" (car bookmark) (cdr bookmark))
-                             (car bookmark))
-                           (car bookmark) #'bookmark-jump))
+                  (dashy--insert-item-button
+                   (if dashy-bookmark-show-file-path
+                       (format "%s (%s)" (car bookmark) (car bookmark))
+                     (car bookmark))
+                   #'(lambda (x) (bookmark-jump (car bookmark))))
                   (insert "\n")))
             (insert "No bookmarks found."))))))
-
 
 (defun dashy--str-len (str)
   "Calculate STR in pixel width."
@@ -341,52 +391,59 @@ See the commands \\[dashy-goto-next-item] \\[dashy-goto-prev-item]
 ;; Interactive Functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;###autoload
 (defun dashy-show ()
   "Create a simple dashboard with useful information."
   (interactive)
-  (dashy-mode)
   (let ((buf (get-buffer-create (dashy--get-dashy-buffer-name))))
     (with-current-buffer buf
+      (unless (derived-mode-p 'dashy-mode)
+        (dashy-mode))
       (read-only-mode -1)
       (erase-buffer)
       (dashy-contents)
-      (read-only-mode 1)
-      (goto-char (point-min)))
-    (switch-to-buffer buf)))
+      (read-only-mode 1))
+    (switch-to-buffer buf)
+    (run-hooks 'dashy-after-show-hook)
+    (dashy-goto-next-item)))
 
 (defun dashy-goto-next-item ()
   "Goto the next item in the dashboard"
   (interactive)
-  (let ((pos (next-single-property-change (point) 'item)))
-    (if pos
-        (goto-char pos))))
+  (unless (forward-button 1 nil nil t)
+           (goto-char (point-min))
+           (dashy-goto-next-item)))
 
 (defun dashy-goto-prev-item ()
   "Goto the previous item in the dashboard"
   (interactive)
-  ())
+  (unless (backward-button 1 nil nil t)
+           (goto-char (point-max))
+           (dashy-goto-prev-item)))
 
 (defun dashy-goto-next-header ()
-  "Goto the next header in the dashboard"
+  "Go to the next header in the dashboard, skipping the current header if present."
   (interactive)
-  (let ((pos (next-single-property-change (point) 'header)))
-    (if pos
-        (goto-char pos))))
+  (when (text-property-search-forward
+       'header (get-text-property (point) 'header)
+       (lambda (val prop) (and prop (not (eq val prop)))))))
 
 (defun dashy-goto-prev-header ()
   "Goto the prev header in the dashboard"
   (interactive)
-  (let ((pos (next-single-property-change (point) 'header)))
-    (if pos
-        (goto-char pos))))
+  (when (text-property-search-backward
+       'header (get-text-property (point) 'header)
+       (lambda (val prop) (and prop (not (eq val prop)))))))
 
-(define-key dashy-mode-map (kbd "C-n") 'dashy-goto-next-item)
-(define-key dashy-mode-map (kbd "C-p") 'dashy-goto-prev-item)
+;;;;;;;;;;;;;;;;;
+;; Keybindings ;;
+;;;;;;;;;;;;;;;;;
 
-;; Evil mode support
-(if (bound-and-true-p evil-mode)
-    (progn
-      (define-key dashy-mode-map (kbd "j") 'dashy-goto-next-item)
-      (define-key dashy-mode-map (kbd "k") 'dashy-goto-prev-item)))
+(defvar-keymap dashy-mode-map
+  "n" #'dashy-goto-next-item
+  "p" #'dashy-goto-prev-item
+  "N" #'dashy-goto-next-header
+  "P" #'dashy-goto-prev-header)
+
 
 (provide 'dashy)
