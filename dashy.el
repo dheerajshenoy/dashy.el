@@ -54,25 +54,10 @@
 ;; Custom Variables ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom dashy-center-vertically t
-  "Center dashboard contents vertically"
-  :type 'boolean
-  :group 'dashy)
-
-(defcustom dashy-center-horizontally  t
-  "Center dashboard contents horizontally"
-  :type 'boolean
-  :group 'dashy)
-
 (defcustom dashy-no-evil-bindings t
   "If set to true, make emacs state the default state on init"
   :type 'boolean
   :group 'dashy)
-
-;; (defcustom dashy-center-image t
-;;   "Center align the image"
-;;   :type 'boolean
-;;   :group 'dashy)
 
 ;; (defcustom dashy-image nil
 ;;   "Path to an image that will be displayed in the dashboard"
@@ -179,26 +164,6 @@
   "Face for the dashy category headers"
   :group 'dashy)
 
-(defface dashy-recent-files-link-face
-  '((t :weight bold :italic t :foreground "light blue" :underline nil))
-  "Face for the recent files link"
-  :group 'dashy)
-
-(defface dashy-recent-files-mouse-hover-face
-  '((t :weight bold :italic t :foreground "blue" :underline t))
-  "Face for the recent files link mouse hover"
-  :group 'dashy)
-
-(defface dashy-bookmark-link-face
-  '((t :weight bold :italic t :foreground "light blue" :underline nil))
-  "Face for the bookmark link"
-  :group 'dashy)
-
-(defface dashy-bookmark-mouse-hover-face
-  '((t :weight bold :italic t :foreground "blue" :underline t))
-  "Face for the bookmark link mouse hover"
-  :group 'dashy)
-
 ;;;;;;;;;;;;;;;
 ;; Functions ;;
 ;;;;;;;;;;;;;;;
@@ -211,62 +176,18 @@
   "Return the dashy buffer name"
   (format "%s" dashy--buffer-name))
 
-(defun dashy--create-recent-file-link (str link &optional func)
-  "Return a link STR which points to the link LINK"
-  (when dashy-linkify-recent-files
-    (propertize str
-                'face 'dashy-recent-files-link-face
-                'mouse-face 'dashy-recent-files-mouse-hover-face
-                'help-echo (format "Click to open %s" link)
-                'keymap (let ((map (make-sparse-keymap)))
-                          (define-key map [mouse-1] (lambda () (interactive)
-                                                      (if func
-                                                          (funcall func link)
-                                                        (find-file link))))
-                          (define-key map [return] (lambda () (interactive)
-                                                     (if func
-                                                         (funcall func link)
-                                                       (find-file link))))
-                          map))))
-
-(defun dashy--create-bookmark-link (str link &optional func)
-  "Return a link STR which points to the link LINK"
-  (when dashy-linkify-bookmarks
-    (propertize str
-                'face 'dashy-bookmark-link-face
-                'mouse-face 'dashy-bookmark-mouse-hover-face
-                'help-echo (format "Click to open %s" link)
-                'keymap (let ((map (make-sparse-keymap)))
-                          (define-key map [mouse-1] (lambda () (interactive)
-                                                      (if func
-                                                          (funcall func link)
-                                                        (find-file link))))
-                          (define-key map [return] (lambda () (interactive)
-                                                     (if func
-                                                         (funcall func link)
-                                                       (find-file link))))
-                          map))))
-
 (defun dashy--insert-item-button (text func)
+  "Inserts a text button with text TEXT and callback function FUNC"
   (insert-button text
                  'action func
                  'follow-link t
                  'face 'dashy-item-face))
 
-
-(defun dashy--insert-item-center-button (text func)
-  (dashy--insert-center (insert-button text
-                                       'action func
-                                       'follow-link t
-                                       'face 'dashy-item-face)))
-
 (defun dashy--insert-header (text)
   "Returns a formatted text for header that takes in the text TEXT"
   (let* ((header (propertize text 'face 'dashy-header-face))
          (start (point)))
-    (if dashy-center-horizontally
-        (dashy--insert-center header)
-      (insert header))
+    (insert header)
     (put-text-property start (point) 'header "t" )
     (insert "\n\n")
     ))
@@ -275,14 +196,8 @@
   "Insert the dashy title into the dashy dashboard"
   (if dashy-show-title
       (let* ((title (propertize (dashy--get-title-text) 'face 'dashy-title-face)))
-        (if dashy-center-horizontally
-            (dashy--insert-center title)
-          (insert title)))
+          (insert title))
     (if dashy-if-no-title-show-blank-lines (insert "\n\n"))))
-
-(defun dashy--add-item-property (object start end)
-  "Add item text-property for the OBJECT from START to END"
-  (put-text-property start end 'item "t"))
 
 (defun dashy--insert-recent-files ()
   "Insert recent files into the dashy dashboard"
@@ -294,14 +209,10 @@
                               recentf-list
                             (seq-take recentf-list dashy-num-recent-files)))
                    start)
-              (if dashy-center-horizontally
-                  (dolist (file files)
-                    (dashy--insert-item-button file #'(lambda (x) (find-file file)))
-                    (insert "\n"))
-                (dolist (file files)
-                  (dashy--insert-item-button file #'(lambda (x) (find-file file)))
-                  (insert "\n")
-                  )))
+              (dolist (file files)
+                (dashy--insert-item-button file #'(lambda (x) (find-file file)))
+                (insert "\n")
+                ))
           (insert "No recent files\n"))
         (insert "\n"))))
 
@@ -322,21 +233,13 @@
         (dashy--insert-header "Bookmarks")
         (let ((bookmarks (dashy--get-bookmarks-with-locations)))
           (if bookmarks
-              (if dashy-center-horizontally
-                  (dolist (bookmark bookmarks)
-                    (dashy--insert-item-center-button
-                                           (if dashy-bookmark-show-file-path
-                                               (format "%s (%s)" (car bookmark) (cdr bookmark))
-                                             (car bookmark))
-                                           #'(lambda (x) (bookmark-jump (cdr bookmark))))
-                    (insert "\n"))
-                (dolist (bookmark bookmarks)
-                  (dashy--insert-item-button
-                   (if dashy-bookmark-show-file-path
-                       (format "%s (%s)" (car bookmark) (car bookmark))
-                     (car bookmark))
-                   #'(lambda (x) (bookmark-jump (car bookmark))))
-                  (insert "\n")))
+              (dolist (bookmark bookmarks)
+                (dashy--insert-item-button
+                 (if dashy-bookmark-show-file-path
+                     (format "%s (%s)" (car bookmark) (car bookmark))
+                   (car bookmark))
+                 #'(lambda (x) (bookmark-jump (car bookmark))))
+                (insert "\n"))
             (insert "No bookmarks found."))))))
 
 (defun dashy--str-len (str)
@@ -357,18 +260,6 @@
           (setq width (max width line-length)))
         (forward-line 1))
       width)))
-
-(defun dashy--center-text (start end)
-  "Center the text between START and END."
-  (let* ((width (dashy--find-max-width start end))
-         (prefix (propertize " " 'display `(space . (:align-to (- center ,(/ (float width) 2)))))))
-    (add-text-properties start end `(line-prefix ,prefix indent-prefix ,prefix))))
-
-(defun dashy--insert-center (&rest strings)
-  "Insert STRINGS in the center of the buffer."
-  (let ((start (point)))
-    (apply #'insert strings)
-    (dashy--center-text start (point))))
 
 ;; (defun dashy--insert-image ()
 ;;   "Insert image into dashboard"
@@ -444,6 +335,5 @@
   "p" #'dashy-goto-prev-item
   "N" #'dashy-goto-next-header
   "P" #'dashy-goto-prev-header)
-
 
 (provide 'dashy)
