@@ -2,7 +2,7 @@
 
 =dashy.el= is a simple, customizable dashboard for Emacs that provides an overview of recent files and bookmarks. The dashboard is presented in a minimalistic manner, focusing on functionality and a clean interface.
 
-[[./images/image1.png]]
+[[./images/image.png]]
 
 * Table of Contents :toc:
 - [[#dashyel][dashy.el]]
