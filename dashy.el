@@ -81,7 +81,7 @@
 
 (defcustom dashy-title "Dashy"
   "Title text displayed in the dashboard"
-  :type 'boolean
+  :type 'string
   :group 'dashy)
 
 (defcustom dashy-if-no-title-show-blank-lines t
@@ -196,7 +196,7 @@
   "Insert the dashy title into the dashy dashboard"
   (if dashy-show-title
       (let* ((title (propertize (dashy--get-title-text) 'face 'dashy-title-face)))
-          (insert title))
+        (insert title))
     (if dashy-if-no-title-show-blank-lines (insert "\n\n"))))
 
 (defun dashy--insert-recent-files ()
@@ -302,29 +302,29 @@
   "Goto the next item in the dashboard"
   (interactive)
   (unless (forward-button 1 nil nil t)
-           (goto-char (point-min))
-           (dashy-goto-next-item)))
+    (goto-char (point-min))
+    (dashy-goto-next-item)))
 
 (defun dashy-goto-prev-item ()
   "Goto the previous item in the dashboard"
   (interactive)
   (unless (backward-button 1 nil nil t)
-           (goto-char (point-max))
-           (dashy-goto-prev-item)))
+    (goto-char (point-max))
+    (dashy-goto-prev-item)))
 
 (defun dashy-goto-next-header ()
   "Go to the next header in the dashboard, skipping the current header if present."
   (interactive)
   (when (text-property-search-forward
-       'header (get-text-property (point) 'header)
-       (lambda (val prop) (and prop (not (eq val prop)))))))
+         'header (get-text-property (point) 'header)
+         (lambda (val prop) (and prop (not (eq val prop)))))))
 
 (defun dashy-goto-prev-header ()
   "Goto the prev header in the dashboard"
   (interactive)
   (when (text-property-search-backward
-       'header (get-text-property (point) 'header)
-       (lambda (val prop) (and prop (not (eq val prop)))))))
+         'header (get-text-property (point) 'header)
+         (lambda (val prop) (and prop (not (eq val prop)))))))
 
 ;;;;;;;;;;;;;;;;;
 ;; Keybindings ;;
